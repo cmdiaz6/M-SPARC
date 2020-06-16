@@ -15,8 +15,13 @@ if S.nspin == 2
     occ(1:nocc(2),2)=1.0; 
 end
 
-fprintf('eigenvalues \n')
-S.EigVal
+fprintf('________________________________________________________________\n');
+fprintf('                           Eigenvalues\n');
+fprintf('________________________________________________________________\n');
 fprintf(' Fermi energy = %f\n',S.lambda_f);
-
+fprintf('%f  ',S.EigVal);
+fprintf('\n');
+fprintf('________________________________________________________________\n');
+fprintf('new occupation\n')
+S.occ
 end

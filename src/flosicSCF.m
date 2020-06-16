@@ -1,7 +1,7 @@
 function [Esic, sic_results, Veff] = flosicSCF(S, Veff, nfrm, wkpt, psi, rho, occ, FOD)
 
 % Add Average SIC potential to S.Veff for psuedo-self-consistent FLOSIC
-bsav=S.b; %save S.b
+%bsav=S.b; %save S.b
 Esic=0;
 AvgSICP=zeros(size(S.psi,1),S.nspin);
 
@@ -35,9 +35,10 @@ for ispin = 1:S.nspin
         ibeg=ibeg+nfrm(1); iend=iend+nfrm(2);
     end
 end
+fprintf(' Etot+Esic = %.8f\n', S.Etotal+Esic);
 
 % transform back for SCF
-S.b=bsav; %necessary?
+%S.b=bsav; %necessary?
 
         %plot AvgSICP along Z-axis
         %vplot = reshape(AvgSICP,S.Nx,S.Ny,S.Nz);

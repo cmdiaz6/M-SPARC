@@ -86,11 +86,30 @@ end
 % S.EigVal = zeros(S.Nev,S.tnkpt*S.nspin);
 
 if S.FlosicFlag == 1
-	% TODO: read old wavefunction for restarts
+    S.Esic=0.0;
+	% Read old wavefunction for restarts
+    %if (isfile('WFOUT.mat'))
+    if (1==2)
+        load WFOUT
+        if sum(size(S.psi)) == sum(size(psi1))
+            fprintf('loading old WFOUT size=%d\n',sum(size(S.psi)));
+            S.psi=psi1; S.occ=occ1; S.Etotal=etot1;
+        
+            %jump straight to SIC correction and FOD forces
+            [S.Esic, S.sic_results, S.fod_forces] = flosicOneshot(S, S.nfrm, S.wkpt, S.psi, S.occ, S.FOD);
+            
+            % Just to keep run from crashing in print. Energies will not be correct except for total
+            [S.Eband,S.Exc,S.Exc_dc,S.Eelec_dc,S.Eent,S.lambda_f, S.netM] = deal(0, 0, 0, 0, 0, 0, 0);
+            return
+        
+        else
+            fprintf('incompatible WFOUT. starting from scratch\n');
+        end
+    end
 
 	% set flag to use fixed integer occupation and energy convergence
 	fixocc = true;
-	% don't use fixed-occupation for spin-unpolarized calculations
+	% don't use fixed-occupation for spin-unpolarized calculations (or Hydrogen atom)
 	if (S.nfrm(2) == 0)
 	    fixocc = false;
 	end
@@ -333,7 +352,10 @@ end
 
 % Calculate FLOSIC energy
 if S.FlosicFlag == 1
-% TODO: write out wavefunctions/potential to restart
+    % write out wavefunctions to restart
+    psi1=S.psi; occ1=S.occ; etot1=S.Etotal;
+    save WFOUT psi1 occ1 etot1
+
 	[S.Esic, S.sic_results, S.fod_forces] = flosicOneshot(S, S.nfrm, S.wkpt, S.psi, S.occ, S.FOD);
 end
 
