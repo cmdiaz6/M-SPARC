@@ -43,3 +43,4 @@ fprintf(' Etot+Esic = %.8f\n', S.Etotal+Esic);
         %plot AvgSICP along Z-axis
         %vplot = reshape(AvgSICP,S.Nx,S.Ny,S.Nz);
         %loglog(1:round(S.Nz/2),squeeze(vplot(round(end/2),round(end/2),round(end/2):end)))
+end

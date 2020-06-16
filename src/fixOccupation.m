@@ -1,4 +1,4 @@
-function [occ] = scf(S,occ,nfrm)
+function [occ] = fixOccupation(S,occ,nfrm)
 
 fprintf('old occupation\n')
 occ
