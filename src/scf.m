@@ -85,6 +85,18 @@ if(S.ForceCount == 1)
 end
 % S.EigVal = zeros(S.Nev,S.tnkpt*S.nspin);
 
+if S.FlosicFlag == 1
+	% TODO: read old wavefunction for restarts
+
+	% set flag to use fixed integer occupation and energy convergence
+	fixocc = true;
+	% don't use fixed-occupation for spin-unpolarized calculations
+	if (S.nfrm(2) == 0)
+	    fixocc = false;
+	end
+	%fixocc = false; %testing partial occ
+	E_temp=0.0;
+end
 
 % SCF LOOP 
 count = 1;
@@ -126,6 +138,11 @@ while (err > S.SCF_tol && count_SCF <= max_scf_iter || count_SCF <= min_scf_iter
 	% Solve for Fermi energy S.lambda_f and occupations
 	S = occupations(S);
 	
+        % fixed occupation for SIC
+        if fixocc
+            [S.occ] = fixOccupation(S,S.occ,S.nfrm)
+        end
+
 	if (((S.ForceCount == 1) && (count >= max_count_first_relax)) ...
 			|| ((S.ForceCount > 1) && (count >= max_count_gen_relax)))
 		% for density mixing, can estimate energy based on input rho and
@@ -158,6 +175,11 @@ while (err > S.SCF_tol && count_SCF <= max_scf_iter || count_SCF <= min_scf_iter
         end
         fprintf(' Etot = %.8f\n', S.Etotal);
 		fprintf(' Eatom = %.8f\n', S.Etotal/S.n_atm);
+
+% add AvgSIC potential to S.Veff
+	if (S.FlosicFlag == 1)
+%        	[S.Esic, S.sic_results, S.Veff] = flosicSCF(S, S.Veff, S.nfrm, S.wkpt, S.psi, S.rho, S.occ, S.FOD);
+	end
 		
 		% fprintf('\n Time for total energy calculation = %f s.',toc(t1));
 		% fprintf('\n Total energy (Ha/atom): %1.9f \n',Etotal/S.n_atm) ;
@@ -192,6 +214,12 @@ while (err > S.SCF_tol && count_SCF <= max_scf_iter || count_SCF <= min_scf_iter
 			end
 		end
 		
+		% SCF convergence based on energy
+                if fixocc
+                    err = abs(S.Esic + S.Etotal - E_temp);
+                    E_temp = S.Esic + S.Etotal;
+                end
+        
 		fprintf(' Error in SCF iteration: %.4e \n',err) ;
 
 		% Mixing to accelerate SCF convergence
@@ -301,6 +329,12 @@ while (err > S.SCF_tol && count_SCF <= max_scf_iter || count_SCF <= min_scf_iter
 	S_Debug.relax(S.Relax_iter).scf_runtime(count_SCF,1) = scf_runtime;
 	fprintf(' This SCF iteration took %.3f s.\n\n', scf_runtime);
 	count = count + 1;
+end
+
+% Calculate FLOSIC energy
+if S.FlosicFlag == 1
+% TODO: write out wavefunctions/potential to restart
+	[S.Esic, S.sic_results, S.fod_forces] = flosicOneshot(S, S.nfrm, S.wkpt, S.psi, S.occ, S.FOD);
 end
 
 S_Debug.relax(S.Relax_iter).scf_flag = 0; % scf_flag being 0 means it's converged

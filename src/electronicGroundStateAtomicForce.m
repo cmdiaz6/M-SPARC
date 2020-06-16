@@ -93,6 +93,30 @@ fprintf(fileID,'Fermi level                        :%18.10E (Ha)\n', S.lambda_f)
 if S.nspin ~= 1
 	fprintf(fileID,'Net Magnetization                  :%18.10E \n', S.netM);
 end
+if (S.FlosicFlag == 1 )
+	fprintf(fileID,'________________________________________________________________\n');
+	fprintf(fileID,'                           SIC RESULTS\n');
+	fprintf(fileID,'________________________________________________________________\n');
+	fprintf(fileID,'SIC results: (Esic, Ecoul, Exc, Ex, Ec): \n');
+	for ii = 1:size(S.sic_results,2)
+    		fprintf(fileID,' %d   %.6f  %.6f  %.6f  %.6f  %.6f\n',ii,S.sic_results(1:5,ii));
+	end
+	fprintf(fileID,'SIC energy                    : %.9f (Ha)\n',S.Esic);
+	fprintf(fileID,'Total energy                  : %.9f (Ha)\n',S.Etotal+S.Esic);
+	fprintf(fileID,'________________________________________________________________\n');
+	fprintf(fileID,'                           FOD Forces\n');
+	fprintf(fileID,'________________________________________________________________\n');
+	for ii = 1:size(S.fod_forces,2)
+	    fprintf(fileID,' %d  %14.6e  %14.6e  %14.6e   magnitude %14.6e\n',ii,S.fod_forces(1:3,ii), norm(S.fod_forces(1:3,ii)));
+	end
+	fprintf(fileID,'________________________________________________________________\n');
+	fprintf(fileID,'                           Eigenvalues\n');
+    fprintf(fileID,'________________________________________________________________\n');
+    fprintf(fileID,' Fermi energy = %f\n',S.lambda_f);
+    fprintf(fileID,'%f  ',S.EigVal);
+    fprintf(fileID,'\n');
+    fprintf(fileID,'________________________________________________________________\n');
+end
 fclose(fileID);
 
 

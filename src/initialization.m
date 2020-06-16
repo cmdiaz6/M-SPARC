@@ -19,6 +19,10 @@ S = read_inpt(S, filename);
 % Read .ion file
 S = read_ion(S, filename);
 
+% Read .fod file for SIC calculations
+S = readFODs(S, filename);
+
+
 % Read pseudopotential files
 for ityp = 1:S.n_typ
 	if (S.Atm(ityp).psptyp == 0)
@@ -1326,6 +1330,14 @@ for ityp = 1:S.n_typ
 	% end
 end
 
+if (S.FlosicFlag == 1)
+	fprintf(fileID,'Total number of electrons          :  %d\n',S.Nelectron);
+
+	fprintf(fileID,'Total number of FODs               :  %d  %d\n',S.nfrm);
+	for ifrm = 1:sum(S.nfrm)
+	    fprintf(fileID,'%d     %.8f %.8f %.8f\n',ifrm,S.FOD(:,ifrm));
+	end
+end
 [~, mem_num, mem_unit] = print_mem(S.memory_usage);
 fprintf(fileID, 'Estimated total memory usage       :  %-.2f %s\n', mem_num, mem_unit);
 
