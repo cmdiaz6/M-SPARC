@@ -9,7 +9,7 @@ fprintf('eigenvalues\n');
 S.EigVal
 
 Esic=0;
-sic_results=zeros(5,sum(nfrm));
+sic_results=zeros(4,sum(nfrm));
 fod_forces =zeros(3,sum(nfrm));
 
 ks=0;

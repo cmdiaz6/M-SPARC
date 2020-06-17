@@ -15,7 +15,6 @@ for ispin = 1:S.nspin
             ks=ks+1;
 % Calculate SIC energy
 % SIC matrix only needed for flosicForces post-SCF
-%            [Esic_ks, sic_results(:,ibeg:iend), SIC, AvgSICP(:,ispin)] = flosicEnergy(S, nfrm(ispin), wkpt(kpt), psi(:,:,ks), occ(:,ispin), FOD(:,ibeg:iend));
             [Esic_ks, sic_results(:,ibeg:iend), ~, AvgSICP(:,ispin)] = flosicEnergy(S, nfrm(ispin), wkpt(kpt), psi(:,:,ks), occ(:,ispin), FOD(:,ibeg:iend));
 
 % divide average SIC potential by rho. SICP.*rho_i done in flosicEnergy
@@ -24,7 +23,7 @@ for ispin = 1:S.nspin
             else
                 AvgSICP(:,ispin) = AvgSICP(:,ispin)./rho(:,ispin+1);
             end
-            fprintf('sum AvgSICP %f\n',sum(AvgSICP(:,ispin).*S.W));
+            %fprintf('sum AvgSICP %f\n',sum(AvgSICP(:,ispin).*S.W));
 
             % minus sign gives right answer
             Veff(:,ispin) = Veff(:,ispin) - AvgSICP(:,ispin);

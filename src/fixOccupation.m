@@ -1,4 +1,5 @@
 function [occ] = fixOccupation(S,occ,nfrm)
+% @brief    fixed occupation for SIC
 
 fprintf('old occupation\n')
 occ

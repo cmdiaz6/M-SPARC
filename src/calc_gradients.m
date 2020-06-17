@@ -1,5 +1,6 @@
 function dpsi = calc_gradients(S, psi)
-	% Calculate gradient of psi
+% @brief    Calculate gradients of psi
+
 %fprintf('calc_gradients %d %d %d %d\n',S.Nev,S.Nx,S.N,S.dx)
 
 dpsi=zeros(size(psi,1),S.Nev,3);
@@ -17,6 +18,7 @@ for n = 1:S.Nev
     % calculate gradients
     [Dpsi_x,Dpsi_y,Dpsi_z] = gradient(psi_n,S.dx,S.dy,S.dz);
     % reshape back to 1d
+
 %% make sure this orders dpsi in the same way
 % swapping X and Y
     dpsi(:,n,2) = reshape(Dpsi_x,S.N,1);

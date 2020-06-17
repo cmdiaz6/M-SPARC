@@ -86,6 +86,9 @@ end
 % S.EigVal = zeros(S.Nev,S.tnkpt*S.nspin);
 
 if S.FlosicFlag == 1
+    % use AvgSIC self-consistent FLOSIC
+    SCFlosicFlag = 0;
+    SCFlosicFlag = 1;
     S.Esic=0.0;
 	% Read old wavefunction for restarts
     %if (isfile('WFOUT.mat'))
@@ -97,6 +100,7 @@ if S.FlosicFlag == 1
         
             %jump straight to SIC correction and FOD forces
             [S.Esic, S.sic_results, S.fod_forces] = flosicOneshot(S, S.nfrm, S.wkpt, S.psi, S.occ, S.FOD);
+            S.Etotal = S.Etotal + S.Esic;
             
             % Just to keep run from crashing in print. Energies will not be correct except for total
             [S.Eband,S.Exc,S.Exc_dc,S.Eelec_dc,S.Eent,S.lambda_f, S.netM] = deal(0, 0, 0, 0, 0, 0, 0);
@@ -196,9 +200,10 @@ while (err > S.SCF_tol && count_SCF <= max_scf_iter || count_SCF <= min_scf_iter
 		fprintf(' Eatom = %.8f\n', S.Etotal/S.n_atm);
 
 % add AvgSIC potential to S.Veff
-	if (S.FlosicFlag == 1)
-%        	[S.Esic, S.sic_results, S.Veff] = flosicSCF(S, S.Veff, S.nfrm, S.wkpt, S.psi, S.rho, S.occ, S.FOD);
-	end
+        if (S.FlosicFlag == 1 && SCFlosicFlag == 1)
+            [S.Esic, S.sic_results, S.Veff] = flosicSCF(S, S.Veff, S.nfrm, S.wkpt, S.psi, S.rho, S.occ, S.FOD);
+            S.Etotal = S.Etotal + S.Esic;
+        end
 		
 		% fprintf('\n Time for total energy calculation = %f s.',toc(t1));
 		% fprintf('\n Total energy (Ha/atom): %1.9f \n',Etotal/S.n_atm) ;
@@ -234,10 +239,10 @@ while (err > S.SCF_tol && count_SCF <= max_scf_iter || count_SCF <= min_scf_iter
 		end
 		
 		% SCF convergence based on energy
-                if fixocc
-                    err = abs(S.Esic + S.Etotal - E_temp);
-                    E_temp = S.Esic + S.Etotal;
-                end
+        if fixocc
+            err = abs(S.Etotal - E_temp);
+            E_temp = S.Etotal;
+        end
         
 		fprintf(' Error in SCF iteration: %.4e \n',err) ;
 
@@ -357,6 +362,9 @@ if S.FlosicFlag == 1
     save WFOUT psi1 occ1 etot1
 
 	[S.Esic, S.sic_results, S.fod_forces] = flosicOneshot(S, S.nfrm, S.wkpt, S.psi, S.occ, S.FOD);
+    if SCFlosicFlag ~= 1 
+        S.Etotal = S.Etotal + S.Esic;
+    end
 end
 
 S_Debug.relax(S.Relax_iter).scf_flag = 0; % scf_flag being 0 means it's converged

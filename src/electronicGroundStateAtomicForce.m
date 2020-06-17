@@ -99,22 +99,33 @@ if (S.FlosicFlag == 1 )
 	fprintf(fileID,'________________________________________________________________\n');
 	fprintf(fileID,'SIC results: (Esic, Ecoul, Exc, Ex, Ec): \n');
 	for ii = 1:size(S.sic_results,2)
-    		fprintf(fileID,' %d   %.6f  %.6f  %.6f  %.6f  %.6f\n',ii,S.sic_results(1:5,ii));
+    		fprintf(fileID,' %d   %.6f  %.6f  %.6f  %.6f\n',ii,S.sic_results(1:4,ii));
 	end
 	fprintf(fileID,'SIC energy                    : %.9f (Ha)\n',S.Esic);
-	fprintf(fileID,'Total energy                  : %.9f (Ha)\n',S.Etotal+S.Esic);
+	fprintf(fileID,'Total energy                  : %.9f (Ha)\n',S.Etotal);
 	fprintf(fileID,'________________________________________________________________\n');
 	fprintf(fileID,'                           FOD Forces\n');
 	fprintf(fileID,'________________________________________________________________\n');
 	for ii = 1:size(S.fod_forces,2)
 	    fprintf(fileID,' %d  %14.6e  %14.6e  %14.6e   magnitude %14.6e\n',ii,S.fod_forces(1:3,ii), norm(S.fod_forces(1:3,ii)));
 	end
+end
+if (S.FlosicFlag == 1 || S.PrintEigenFlag == 1)
 	fprintf(fileID,'________________________________________________________________\n');
 	fprintf(fileID,'                           Eigenvalues\n');
     fprintf(fileID,'________________________________________________________________\n');
     fprintf(fileID,' Fermi energy = %f\n',S.lambda_f);
-    fprintf(fileID,'%f  ',S.EigVal);
-    fprintf(fileID,'\n');
+    ks = 1;
+    for spin = 1:S.nspin
+        if S.nspin == 2
+            fprintf(fileID,'spin %d:   ',spin);
+        end
+		for kpt = 1:S.tnkpt
+            fprintf(fileID,'%f  ', S.EigVal(:,ks) );
+			ks = ks + 1;
+		end
+        fprintf(fileID,'\n');
+    end
     fprintf(fileID,'________________________________________________________________\n');
 end
 fclose(fileID);

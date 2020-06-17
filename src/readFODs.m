@@ -1,14 +1,12 @@
-function S = ReadFODs(S, filename)
-% @brief	ReadFODs(filename) reads data from FOD positions from file 'filename'
+function S = readFODs(S, filename)
+% @brief	readFODs(filename) reads data from FOD positions from file 'filename'
 %
-% @param filename	The data filename
+% @param filename	The FOD filename, without suffix.
 %
-% @authors	
+% @authors
 %
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                           Read Input file                               %  
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% set flag for FLOSIC run if file is present
 S.FlosicFlag = 0;
 
 % open .fod file
@@ -27,7 +25,7 @@ textscan(fid1,'%s',1,'delimiter','\n');
 C_nfrm = textscan(fid1,'%f %f',1,'delimiter','\n');
 nfrm = [C_nfrm{1,1},C_nfrm{1,2}];
 
-fprintf('Number of FODs %d %d\n',nfrm(1),nfrm(2));
+fprintf(' Number of FODs %d %d\n',nfrm(1),nfrm(2));
 
 % FOD positions
 textscan(fid1,'%s',2,'delimiter','\n');
@@ -51,7 +49,7 @@ FOD = FOD';
 S.nfrm = nfrm;
 S.FOD = FOD;
 
-fprintf('printing FODs nfrm= %d  %d\n',nfrm);
+fprintf('printing FODs: nfrm= %d  %d\n',nfrm);
 for ifrm = 1:size(FOD,2)
     fprintf('%d     %.8f %.8f %.8f\n',ifrm,FOD(:,ifrm));
 end

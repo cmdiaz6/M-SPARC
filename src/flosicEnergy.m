@@ -26,11 +26,11 @@ function [sic_energy, sic_results, SIC, AvgSICP] = flosicEnergy(S, nfrm, wkpt, p
 S.b=0;
 
 fprintf('inside sic_energy: nfrm = %d, Nelectron = %d \n',nfrm, S.Nelectron);
-fprintf('printing FODs\n');
-for iwf=1:nfrm
-    fprintf(' %.6f ',FOD(:,iwf));
-    fprintf('\n')
-end
+%fprintf('printing FODs\n');
+%for iwf=1:nfrm
+%    fprintf(' %.6f ',FOD(:,iwf));
+%    fprintf('\n')
+%end
 
 SIC=zeros(nfrm,nfrm);
 AvgSICP=zeros(size(S.psi,1),1);
@@ -43,9 +43,8 @@ AvgSICP=zeros(size(S.psi,1),1);
 fprintf(2,' ------------------\n');
 % loop through orbitals for SIC energies
 sic_energy=0;
-fprintf('SIC loop %d\n',nfrm);
 for iwf=1:nfrm %(ispin)
-    fprintf('starting sic loop %d occ %f\n',iwf,occ(iwf));
+    fprintf('starting sic loop %d of %d. occ=%f\n',iwf,nfrm,occ(iwf));
 
     % Electron density in spin-polarized form
     S.rho = zeros(S.N,3);
@@ -62,7 +61,7 @@ for iwf=1:nfrm %(ispin)
     %S.NetCharge = -1; %try for PBC
     S = poissonSolve(S, S.poisson_tol, 10);
     S.NetCharge=qsav; %restore NetCharge
-    fprintf('asy %f %f\n',S.phi(1)*sqrt(3*(S.L1/2)^2),S.phi(end)*sqrt(3*(S.L1/2)^2));
+    %fprintf('asy %f %f\n',S.phi(1)*sqrt(3*(S.L1/2)^2),S.phi(end)*sqrt(3*(S.L1/2)^2));
 
     % spin polarized forms always needed for Vxc/Exc
     spinsav=S.nspin;
@@ -72,34 +71,28 @@ for iwf=1:nfrm %(ispin)
     S.nspin=spinsav; %restore spin
 
     % Calculate energy
-    %[Etotal,Eband,Exc,Exc_dc,Eelec_dc,Eent] = EvaluateTotalEnergy(S);
     % Exchange-correlation energy
     Exc   =      sum(S.e_xc.*S.rho(:,1).*S.W);
     % Electrostatic energy
-    %S.phi = S.phi*(S.nspin/2); % why is this in NRLMOL?
     Eelec = -0.5*sum((S.rho(:,1)).*S.phi.*S.W);
 
     Etotal_i = Eelec - Exc;
     Etotal_i = Etotal_i*(2.0/S.nspin); % *S.occfac
 
     % for testing against own old implementation
-    % exchange-only
+    % LDA exchange
     C2 = -(3/4)*(6/pi)^(1/3); % constant for spin-polarized exchange energy
     Ex = C2*sum((S.rho(:,1).^(4/3)).*S.W) ;
     %Vx = (4/3)*C2*S.rho(:,1).^(1/3) ;
     %correlation-only
-    Ec = 0.0;
-    %[Ec, ~] = pw91cor(S.rho(:,1),S); 
+    %Ec = 0.0;
     %[Ec, Vc] = pw91cor(S.rho(:,1),S); 
-    %fprintf('pw91 exchange %f  correlation %f\n',Ex,Ec);
-    %fprintf('Exc 1: %f  pw91: %f  diff: %f\n',Exc,Ex+Ec,Exc-Ex-Ec);
-    %fprintf('sum diff Vxc %f\n',sum(S.Vxc(:,1)-Vx-Vc));
 
-    sic_results(:,iwf) = [Etotal_i, Eelec, Exc, Ex, Ec]; %, xdel];
+    sic_results(:,iwf) = [Etotal_i, Eelec, Exc, Ex]; %, Ec]; %, xdel];
 
     sic_energy = sic_energy + Etotal_i;
 
-    fprintf('sic results: Esic_i, Eelec, Exc, LDA-Ex, LDA-Ec\n');
+    fprintf('sic results: Esic_i, Eelec, Exc, LDA-Ex'); %, LDA-Ec\n');
     fprintf(' %.8f  ',sic_results(:,iwf));
     fprintf(2,'\n ------------------\n');
 
@@ -118,9 +111,9 @@ for iwf=1:nfrm %(ispin)
     % divide by total density outside
 end %nfrm
 
-fprintf('SIC results: (Esic, Ecoul, Exc, Ex, Ec): \n');
+fprintf('SIC results: (Esic, Ecoul, Exc, Ex): \n'); % , Ec): \n');
 for ii = 1:nfrm
-    fprintf(' %d   %.6f  %.6f  %.6f  %.6f  %.6f\n',ii,sic_results(1:5,ii));
+    fprintf(' %d   %.6f  %.6f  %.6f  %.6f\n',ii,sic_results(1:4,ii));
 end
 fprintf('SIC energy:                    %.9f (Ha)\n',sic_energy);
 %fprintf('Total energy:                  %.9f (Ha)\n',S.Etotal+sic_energy);
