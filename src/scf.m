@@ -86,9 +86,8 @@ end
 % S.EigVal = zeros(S.Nev,S.tnkpt*S.nspin);
 
 if S.FlosicFlag == 1
-    % use AvgSIC self-consistent FLOSIC
+    % set to 1 to use AvgSIC self-consistent FLOSIC
     SCFlosicFlag = 0;
-    SCFlosicFlag = 1;
     S.Esic=0.0;
 	% Read old wavefunction for restarts
     %if (isfile('WFOUT.mat'))
@@ -161,10 +160,10 @@ while (err > S.SCF_tol && count_SCF <= max_scf_iter || count_SCF <= min_scf_iter
 	% Solve for Fermi energy S.lambda_f and occupations
 	S = occupations(S);
 	
-        % fixed occupation for SIC
-        if fixocc
-            [S.occ] = fixOccupation(S,S.occ,S.nfrm)
-        end
+    % fixed occupation for SIC
+    if fixocc
+        [S.occ] = fixOccupation(S,S.occ,S.nfrm);
+    end
 
 	if (((S.ForceCount == 1) && (count >= max_count_first_relax)) ...
 			|| ((S.ForceCount > 1) && (count >= max_count_gen_relax)))
@@ -195,12 +194,13 @@ while (err > S.SCF_tol && count_SCF <= max_scf_iter || count_SCF <= min_scf_iter
 			end
 			fprintf(' Escc = %.8f\n', S.Escc);
 			S.Etotal = S.Etotal + S.Escc;
-        end
+		end
         fprintf(' Etot = %.8f\n', S.Etotal);
 		fprintf(' Eatom = %.8f\n', S.Etotal/S.n_atm);
 
 % add AvgSIC potential to S.Veff
         if (S.FlosicFlag == 1 && SCFlosicFlag == 1)
+
             [S.Esic, S.sic_results, S.Veff] = flosicSCF(S, S.Veff, S.nfrm, S.wkpt, S.psi, S.rho, S.occ, S.FOD);
             S.Etotal = S.Etotal + S.Esic;
         end

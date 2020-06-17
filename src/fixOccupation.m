@@ -5,8 +5,9 @@ fprintf('old occupation\n')
 occ
 
 %reset to integer occupation
-nocc=sum(occ);
-nocc=round(nocc);
+%nocc=sum(occ);
+%nocc=round(nocc);
+
 % or use FOD input occupation
 nocc=nfrm;
 
@@ -20,9 +21,18 @@ fprintf('________________________________________________________________\n');
 fprintf('                           Eigenvalues\n');
 fprintf('________________________________________________________________\n');
 fprintf(' Fermi energy = %f\n',S.lambda_f);
-fprintf('%f  ',S.EigVal);
-fprintf('\n');
+ks = 1;
+for spin = 1:S.nspin
+    if S.nspin == 2
+        fprintf('spin %d:   ',spin);
+    end
+	for kpt = 1:S.tnkpt
+        fprintf('%f  ', S.EigVal(:,ks) );
+		ks = ks + 1;
+	end
+    fprintf('\n');
+end
 fprintf('________________________________________________________________\n');
 fprintf('new occupation\n')
-S.occ
+occ
 end
