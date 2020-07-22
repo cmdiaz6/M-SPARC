@@ -85,6 +85,7 @@ if(S.ForceCount == 1)
 end
 % S.EigVal = zeros(S.Nev,S.tnkpt*S.nspin);
 
+fixocc = false;
 if S.FlosicFlag == 1
     % set to 1 to use AvgSIC self-consistent FLOSIC
     SCFlosicFlag = 0;
