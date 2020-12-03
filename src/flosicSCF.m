@@ -19,10 +19,16 @@ for ispin = 1:S.nspin
 
 % divide average SIC potential by rho. SICP.*rho_i done in flosicEnergy
             if S.nspin == 1
-                AvgSICP(:,ispin) = AvgSICP(:,ispin)./rho(:);
+                % multiply by 2, to account for spin
+                AvgSICP(:,ispin) = 2.0*AvgSICP(:,ispin)./rho(:);
             else
                 AvgSICP(:,ispin) = AvgSICP(:,ispin)./rho(:,ispin+1);
             end
+
+            % for testing SIC scaling factor
+            %alpha = 0.5;
+            %fprintf('scaling AvgSIC by %.2f\n',alpha);
+            %AvgSICP(:,ispin) = alpha*AvgSICP(:,ispin);
             %fprintf('sum AvgSICP %f\n',sum(AvgSICP(:,ispin).*S.W));
 
             % minus sign gives right answer
